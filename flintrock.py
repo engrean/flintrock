@@ -965,17 +965,18 @@ def provision_node(
 
         with client.open_sftp() as sftp:
             sftp.put(
-                localpath='./setup-ephemeral-storage.sh',
-                remotepath='/tmp/setup-ephemeral-storage.sh')
-            sftp.chmod(path='/tmp/setup-ephemeral-storage.sh', mode=0o755)
+                localpath='./setup-ephemeral-storage.py',
+                remotepath='/tmp/setup-ephemeral-storage.py')
 
         print("[{h}] Configuring ephemeral storage...".format(h=host))
+        # TODO: Print some kind of warning if storage is large, since formatting
+        #       will take several minutes (~4 minutes for 2TB).
         ssh_check_output(
             client=client,
             command="""
                 set -e
-                /tmp/setup-ephemeral-storage.sh
-                rm -f /tmp/setup-ephemeral-storage.sh
+                python /tmp/setup-ephemeral-storage.py
+                rm -f /tmp/setup-ephemeral-storage.py
             """)
 
         # The default CentOS AMIs on EC2 don't come with Java installed.
