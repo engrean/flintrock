@@ -44,8 +44,14 @@ if [ -n "$non_root_devices" ]; then
     mount_num=1
     for device in $non_root_devices; do
         mount_name="/mnt${mount_num}"
+
         sudo mkdir "$mount_name"
         sudo mount -o "defaults,noatime,nodiratime" "$device" "$mount_name"
+
+        # Replace any existing fstab entries with our own.
+        grep -v -e "^$device" /etc/fstab | sudo tee /etc/fstab
+        echo "$device   $mount_name   ext4   defaults" | sudo tee -a /etc/fstab
+
         mount_num=$((mount_num + 1))
     done
 fi
